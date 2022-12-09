@@ -1,8 +1,5 @@
 import numpy as np
 import cv2
-from shapely.geometry import Point, Polygon
-
-import time
 from chessboard import display
 
 
@@ -14,26 +11,7 @@ transform_matrix = np.load("focus_matrix.npy")
 # Constant parameters used in Aruco methods
 ARUCO_PARAMETERS = cv2.aruco.DetectorParameters_create()
 ARUCO_DICT = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_50)
-
-
-
-
-
-# def ChessToFEN(chessBoardState):
-#     fen_string = 'rnbqkbnr/pppppppp/11111111/11111111/11111111/11111111/PPPPPPPP/RNBQKBNR'
-
-#     row1 = [str(v) for v in list(chessBoardState.values())[:8]]
-#     row2 = [str(v) for v in list(chessBoardState.values())[8:16]]
-#     row3 = [str(v) for v in list(chessBoardState.values())[16:24]]
-#     row4 = [str(v) for v in list(chessBoardState.values())[24:32]]
-#     row5 = [str(v) for v in list(chessBoardState.values())[32:40]]
-#     row6 = [str(v) for v in list(chessBoardState.values())[40:48]]
-#     row7 = [str(v) for v in list(chessBoardState.values())[48:56]]
-#     row8 = [str(v) for v in list(chessBoardState.values())[56:64]]
-
-#     fen_string = ''.join(row1) + '/' + ''.join(row2) + '/' + ''.join(row3) + '/' + ''.join(row4) + '/' + ''.join(row5) + '/' + ''.join(row6) + '/' + ''.join(row7) + '/' + ''.join(row8) 
-
-#     return (fen_string )
+base_fen_string = 'rnbqkbnr/pppppppp/11111111/11111111/11111111/11111111/PPPPPPPP/RNBQKBNR'
 
 
 
@@ -66,9 +44,7 @@ board = cv2.aruco.GridBoard_create(
 
 
 
-rotation_vectors, translation_vectors, dist = np.load("rvecs.npy"), np.load("tvecs.npy"), np.load('dist.npy')
-axis = np.float32([[-.5,-.5,0], [-.5,.5,0], [.5,.5,0], [.5,-.5,0],
-                   [-.5,-.5,1],[-.5,.5,1],[.5,.5,1],[.5,-.5,1] ])
+#rotation_vectors, translation_vectors, dist = np.load("rvecs.npy"), np.load("tvecs.npy"), np.load('dist.npy')
 
 # Make output image fullscreen
 cv2.namedWindow('ChessBoardsImage',cv2.WINDOW_NORMAL)
@@ -87,43 +63,10 @@ IMAGE_WIDTH = ChessBoardsImage.shape[1]
 M = IMAGE_HEIGHT//8
 N = IMAGE_WIDTH//8
 
-# all_coords = []
-# square_coords = []
 
 
-
-# for y in range(0,IMAGE_HEIGHT + 90,M):
-#     for x in range(0,IMAGE_WIDTH + 160, N):
-#         all_coords.append((x,y))
-
-
-
-# for i in range(0,71):
-        
-#         if(all_coords[i][0] != 1280):
-        
-#             temp = [all_coords[i],all_coords[i+1],all_coords[i+9],all_coords[i+10]]
-#             square_coords.append(Polygon(temp))
-        
-            
-
-
-
-
-# chess_coords = ["A8","B8","C8","D8","E8","F8","G8","H8",
-# "A7","B7","C7","D7","E7","F7","G7","H7",
-# "A6","B6","C6","D6","E6","F6","G6","H6",
-# "A5","B5","C5","D5","E5","F5","G5","H5",
-# "A4","B4","C4","D4","E4","F4","G4","H4",
-# "A3","B3","C3","D3","E3","E3","G3","H3",
-# "A2","B2","C2","D2","E2","F2","G2","H2",
-# "A1","B1","C1","D1","E1","F1","G1","H1",
-
-
-# ]
-
-
-chess_coords_npy = np.array([["A8","B8","C8","D8","E8","F8","G8","H8"],
+chess_coords_npy = np.array([
+["A8","B8","C8","D8","E8","F8","G8","H8"],
 ["A7","B7","C7","D7","E7","F7","G7","H7"],
 ["A6","B6","C6","D6","E6","F6","G6","H6"],
 ["A5","B5","C5","D5","E5","F5","G5","H5"],
@@ -131,26 +74,19 @@ chess_coords_npy = np.array([["A8","B8","C8","D8","E8","F8","G8","H8"],
 ["A3","B3","C3","D3","E3","E3","G3","H3"],
 ["A2","B2","C2","D2","E2","F2","G2","H2"],
 ["A1","B1","C1","D1","E1","F1","G1","H1"],
-
-
 ])
 
 chess_board_state_npy = np.ones((8,8), dtype=object)
 
-
-# chess_squares_state = list(1 for i in range(64))
-# chess_board_coords = dict(zip(chess_coords,square_coords))
-# chess_board_state = dict(zip(chess_coords,chess_squares_state))
 
 game_board = display.start()
 display.update(ChessToFENNPY(chess_board_state_npy), game_board)
 
 
 while(cam.isOpened()):
-
     # Capturing each frame of our video stream
     ret, ChessBoardsImage = cam.read()
-    # ChessBoardsImage = cv2.flip(ChessBoardsImage,1)
+    
     
         # grayscale image
     ChessBoardsImage = cv2.warpPerspective(ChessBoardsImage, transform_matrix, (1280,720), flags=cv2.INTER_LINEAR)
@@ -163,7 +99,7 @@ while(cam.isOpened()):
             x1 = x + N
             cv2.rectangle(ChessBoardsImage, (x, y), (x1, y1), (0, 255, 0))
             
-    if ret == True:
+    if ret:
         # Detect Aruco markers
         corners, ids, rejectedImgPoints = cv2.aruco.detectMarkers(grayImage, ARUCO_DICT, parameters=ARUCO_PARAMETERS)
         #refine detection
@@ -175,44 +111,42 @@ while(cam.isOpened()):
                 rejectedCorners = rejectedImgPoints,
                 cameraMatrix = cameraMatrix,
                 distCoeffs = distCoeffs)   
+
         if len(corners) > 0:
+
+            chess_board_state_npy = np.ones((8,8), dtype=object)
+            
+            flat_ids = []
+            for sublist in ids:
+                for item in sublist:
+                    flat_ids.append(item)
             
             
+            points = list(zip(flat_ids, corners))
             
-            for i in range(len(ids)):
-                
-                (x_sum,y_sum) = ((corners[i-1][0][0][0] + corners[i-1][0][1][0] + corners[i-1][0][2][0] + corners[i-1][0][3][0]) / 4, 
-                    (corners[i-1][0][0][1] + corners[i-1][0][1][1] + corners[i-1][0][2][1] + corners[i-1][0][3][1]) / 4)
-                
-                #arucoCenter = Point(x_sum,y_sum)
-                arucoCenter = (int(x_sum//160), int(y_sum//90))
 
-                chess_board_state_npy = np.ones((8,8), dtype=object)
-                
-                if ids[i][0] in CHESS_PIECES:
-                    
-                    chess_board_state_npy[arucoCenter[1],arucoCenter[0]] = CHESS_PIECES[ids[i][0]]
+            aruco_centers = {}
+            for piece_id, corner in points:
+                x_chess = int(sum(corner[0][c][0] for c in range(4))/4)//160
+                y_chess = int(sum(corner[0][c][1] for c in range(4))/4)//90
 
-                    fen_string = ChessToFENNPY(chess_board_state_npy)
-                    display.update(fen_string, game_board)
+                chess_board_state_npy[y_chess, x_chess] = CHESS_PIECES[piece_id] # update for fen string
 
-                # for k in chess_board_state.keys():
-                #     chess_board_state[k] = 1
-                # for k,v in chess_board_coords.items():
-                        
-                #     if arucoCenter.within(v):
-                #         # print("Square : " ,k )
-                #         # print("Piece : ", CHESS_PIECES[ids[i][0]])
-                #         if ids[i][0] in CHESS_PIECES:
-                #             chess_board_state[k] = CHESS_PIECES[ids[i][0]]
-                #             fen_string = ChessToFEN(chess_board_state)
-                #             display.update(fen_string, game_board)
+            cv2.aruco.drawDetectedMarkers(ChessBoardsImage, corners,ids,borderColor=(0, 0, 255)) 
+            
+        
 
-                
-                #rotation_vectors, translation_vectors, _objPoints = cv2.aruco.estimatePoseSingleMarkers(corners, 1, cameraMatrix, distCoeffs)
-               
-                cv2.aruco.drawDetectedMarkers(ChessBoardsImage, corners,ids,borderColor=(0, 0, 255)) 
-                
+        
+            fen_string = ChessToFENNPY(chess_board_state_npy)
+            display.update(fen_string, game_board)
+
+            if (fen_string == base_fen_string):
+                cv2.putText(ChessBoardsImage, "Game ready to start !",(50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1/2, (0,0,255), 1, cv2.LINE_AA)
+
+        else : 
+            chess_board_state_npy = np.ones((8,8), dtype=object)
+            fen_string = ChessToFENNPY(chess_board_state_npy)
+            display.update(fen_string, game_board)
         cv2.imshow('ChessBoardsImage', ChessBoardsImage)
 
 
