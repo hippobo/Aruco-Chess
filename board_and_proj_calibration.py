@@ -7,7 +7,7 @@ from itertools import permutations
 screen_coords = [[0,0], [0,720],[1280,0],[1280,720]]
 cameraMatrix = np.load("calibration_matrix.npy")
 distCoeffs = np.load("distortion_coefficients.npy")
-
+CAM_NUMBER = 0
 
 cv2.namedWindow("Damier", cv2.WND_PROP_FULLSCREEN)
 cv2.setWindowProperty("Damier", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
@@ -16,7 +16,7 @@ sleeping_time = 300
 
 def get_frame():
 
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(CAM_NUMBER)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
     

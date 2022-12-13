@@ -7,7 +7,7 @@ CHESS_PIECES = {1 : "NONE", 2 : "R",3 : "N",4 : "B",5 : "Q",6 : "K", 7 : "p", 8 
 cameraMatrix = np.load("calibration_matrix.npy")
 distCoeffs = np.load("distortion_coefficients.npy")
 transform_matrix = np.load("focus_matrix.npy")
-
+CAM_NUMBER = 0
 # Constant parameters used in Aruco methods
 ARUCO_PARAMETERS = cv2.aruco.DetectorParameters_create()
 ARUCO_DICT = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_50)
@@ -51,7 +51,7 @@ cv2.namedWindow('ChessBoardsImage',cv2.WINDOW_NORMAL)
 #cv2.setWindowProperty("ChessBoardsImage", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
 
-cam = cv2.VideoCapture(0)
+cam = cv2.VideoCapture(CAM_NUMBER)
 cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 ret, ChessBoardsImage = cam.read()
@@ -127,14 +127,15 @@ while(cam.isOpened()):
 
             aruco_centers = {}
             for piece_id, corner in points:
-                x_chess = int(sum(corner[0][c][0] for c in range(4))/4)//160
-                y_chess = int(sum(corner[0][c][1] for c in range(4))/4)//90
+                if piece_id in CHESS_PIECES:
+                    x_chess = int(sum(corner[0][c][0] for c in range(4))/4)//160
+                    y_chess = int(sum(corner[0][c][1] for c in range(4))/4)//90
 
-                chess_board_state_npy[y_chess, x_chess] = CHESS_PIECES[piece_id] # update for fen string
+                    chess_board_state_npy[y_chess, x_chess] = CHESS_PIECES[piece_id] # update for fen string
 
             cv2.aruco.drawDetectedMarkers(ChessBoardsImage, corners,ids,borderColor=(0, 0, 255)) 
             
-        
+            
 
         
             fen_string = ChessToFENNPY(chess_board_state_npy)
