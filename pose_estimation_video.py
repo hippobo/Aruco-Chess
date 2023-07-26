@@ -139,6 +139,7 @@ while(cam.isOpened()):
 
         
             fen_string = ChessToFENNPY(chess_board_state_npy)
+            print("Current game state" , fen_string)
             display.update(fen_string, game_board)
 
             if (fen_string == base_fen_string):
@@ -147,6 +148,7 @@ while(cam.isOpened()):
         else : 
             chess_board_state_npy = np.ones((8,8), dtype=object)
             fen_string = ChessToFENNPY(chess_board_state_npy)
+           
             display.update(fen_string, game_board)
         cv2.imshow('ChessBoardsImage', ChessBoardsImage)
 

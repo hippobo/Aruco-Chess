@@ -1,6 +1,6 @@
 '''
 Sample Usage:-
-python3 camera_calibration.py --dir Chessboard/ --square_size 0.020
+python3 camera_calibration.py --dir ./Chessboard --square_size 0.024 --width 9 --height 6 
 '''
 
 import numpy as np
