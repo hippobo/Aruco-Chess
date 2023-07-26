@@ -1,5 +1,5 @@
 # Aruco Chess
-Calibration and Aruco Marker Recognition for chess boards using aruco Markers for each piece.
+Simple Calibration and Aruco Marker Recognition for chess boards using aruco Markers for each piece.
 
 ## Demo 
 
